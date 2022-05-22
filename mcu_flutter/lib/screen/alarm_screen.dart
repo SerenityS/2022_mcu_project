@@ -14,11 +14,9 @@ class AlarmScreen extends StatefulWidget {
 class _AlarmScreenState extends State<AlarmScreen> {
   var alarmList = [];
 
-  TimeOfDay selectedTime = TimeOfDay.now();
-
   _addTime() async {
     TimeOfDay? timeOfDay =
-        await showTimePicker(context: context, initialTime: selectedTime);
+        await showTimePicker(context: context, initialTime: TimeOfDay.now());
 
     await addAlarm(
         "${NumberFormat("00").format(timeOfDay?.hour)}:${NumberFormat("00").format(timeOfDay?.minute)}");
@@ -27,7 +25,7 @@ class _AlarmScreenState extends State<AlarmScreen> {
 
   _setTime(alarm) async {
     TimeOfDay? timeOfDay =
-        await showTimePicker(context: context, initialTime: selectedTime);
+        await showTimePicker(context: context, initialTime: alarm[1]);
     if (timeOfDay != alarm[1] && timeOfDay != alarm[1]) {
       alarm[1] = timeOfDay;
       await setAlarm(alarm[0],
