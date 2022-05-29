@@ -29,13 +29,13 @@ class _MainScreenState extends State<MainScreen> {
       PersistentBottomNavBarItem(
         icon: const Icon(Icons.alarm),
         title: ("Alarm"),
-        activeColorPrimary: Colors.blue,
+        activeColorPrimary: Colors.black,
         inactiveColorPrimary: Colors.grey,
       ),
       PersistentBottomNavBarItem(
         icon: const Icon(Icons.calendar_month),
         title: ("Calendar"),
-        activeColorPrimary: Colors.blue,
+        activeColorPrimary: Colors.black,
         inactiveColorPrimary: Colors.grey,
       ),
     ];
