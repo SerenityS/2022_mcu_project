@@ -18,38 +18,37 @@ class _AlarmScreenState extends State<AlarmScreen> {
     TimeOfDay? timeOfDay =
         await showTimePicker(context: context, initialTime: TimeOfDay.now());
 
-    await addAlarm(
-        "${NumberFormat("00").format(timeOfDay?.hour)}:${NumberFormat("00").format(timeOfDay?.minute)}");
+    await sendSocketData(
+        '{"cmd":"add_alarm", "time": "${NumberFormat("00").format(timeOfDay?.hour)}:${NumberFormat("00").format(timeOfDay?.minute)}"}');
     setState(() {});
   }
 
   _setTime(alarm) async {
-    TimeOfDay? timeOfDay =
-        await showTimePicker(context: context, initialTime: alarm[1]);
-    if (timeOfDay != alarm[1] && timeOfDay != alarm[1]) {
+    TimeOfDay? timeOfDay = await showTimePicker(
+        context: context, initialTime: alarm[1], useRootNavigator: false);
+    if (timeOfDay == null) {
+      timeOfDay = TimeOfDay.now();
+    } else if (timeOfDay != alarm[1] && timeOfDay != alarm[1]) {
       alarm[1] = timeOfDay;
-      await setAlarm(alarm[0],
-          "${NumberFormat("00").format(alarm[1].hour)}:${NumberFormat("00").format(alarm[1].minute)}");
+      await sendSocketData(
+          '{"cmd": "set_alarm", "index": ${alarm[0]}, "time": "${NumberFormat("00").format(alarm[1].hour)}:${NumberFormat("00").format(alarm[1].minute)}"}');
       setState(() {});
     }
   }
 
   _deleteAlarm(alarm) async {
-    await removeAlarm(alarm[0]);
+    await sendSocketData('{"cmd": "remove_alarm", "index": ${alarm[0]}}');
     setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("알람"),
-      ),
       body: FutureBuilder(
-        future: getAlarm(),
-        builder: (context, snapshot) {
+        future: sendSocketData('{"cmd": "get_alarm"}'),
+        builder: (contexts, snapshot) {
           if (!snapshot.hasData) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           } else {
             var alarmData = jsonDecode(snapshot.data.toString());
             alarmList = [];
@@ -91,34 +90,15 @@ class _AlarmScreenState extends State<AlarmScreen> {
                         ),
                       ),
                     ),
-                  Center(
-                    child: SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.95,
-                      child: Card(
-                        clipBehavior: Clip.antiAlias,
-                        child: InkWell(
-                          onTap: () {
-                            _addTime();
-                          },
-                          child: SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.1,
-                            child: const Center(
-                              child: Text(
-                                "알람 추가",
-                                style: TextStyle(
-                                    fontSize: 30, fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
                 ],
               ),
             );
           }
         },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _addTime(),
+        child: const Icon(Icons.add),
       ),
     );
   }

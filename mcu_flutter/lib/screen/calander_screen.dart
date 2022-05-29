@@ -15,54 +15,51 @@ class CalendarScreen extends StatefulWidget {
 class _CalendarScreenState extends State<CalendarScreen> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("캘린더")),
-      body: FutureBuilder(
-        future: getStudyData(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          } else {
-            final List<Study> studies = <Study>[];
-            var studyData = jsonDecode(snapshot.data.toString());
+    return FutureBuilder(
+      future: sendSocketData('{"cmd": "get_study_data"}'),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        } else {
+          final List<Study> studies = <Study>[];
+          var studyData = jsonDecode(snapshot.data.toString());
 
-            for (var study in studyData) {
-              DateTime startTime = DateTime.parse(study[1].toString());
-              DateTime endTime = DateTime.parse(study[2].toString());
-              DateTime studyTime = endTime.subtract(
-                Duration(
-                    hours: startTime.hour,
-                    minutes: startTime.minute,
-                    seconds: startTime.second),
-              );
-              studies.add(Study(
-                  DateFormat('HH:mm:ss').format(studyTime).toString(),
-                  startTime,
-                  endTime,
-                  const Color(0xFF0F8644),
-                  false));
-            }
-
-            return SfCalendar(
-              view: CalendarView.month,
-              initialSelectedDate: DateTime.now(),
-              dataSource: MeetingDataSource(studies),
-              monthViewSettings: const MonthViewSettings(
-                showAgenda: true,
-                agendaViewHeight: 300,
-              ),
+          for (var study in studyData) {
+            DateTime startTime = DateTime.parse(study[1].toString());
+            DateTime endTime = DateTime.parse(study[2].toString());
+            DateTime studyTime = endTime.subtract(
+              Duration(
+                  hours: startTime.hour,
+                  minutes: startTime.minute,
+                  seconds: startTime.second),
             );
+            studies.add(Study(
+                DateFormat('HH:mm:ss').format(studyTime).toString(),
+                startTime,
+                endTime,
+                const Color(0xFF0F8644),
+                false));
           }
-        },
-      ),
+
+          return SfCalendar(
+            view: CalendarView.month,
+            initialSelectedDate: DateTime.now(),
+            dataSource: StudyDataSource(studies),
+            monthViewSettings: const MonthViewSettings(
+              showAgenda: true,
+              agendaViewHeight: 300,
+            ),
+          );
+        }
+      },
     );
   }
 }
 
-class MeetingDataSource extends CalendarDataSource {
-  MeetingDataSource(List<Study> source) {
+class StudyDataSource extends CalendarDataSource {
+  StudyDataSource(List<Study> source) {
     appointments = source;
   }
 

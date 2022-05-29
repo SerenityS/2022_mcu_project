@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mcu/const/theme_data.dart';
-import 'package:mcu/screen/alarm_screen.dart';
 
 Widget customCard(context, text, targetScreen) {
   return Padding(
