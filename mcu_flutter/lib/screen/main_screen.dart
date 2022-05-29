@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:mcu/const/const.dart';
 import 'package:mcu/screen/alarm_screen.dart';
 import 'package:mcu/screen/calander_screen.dart';
+import 'package:mcu/screen/schedule_screen.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 
 class MainScreen extends StatefulWidget {
@@ -21,6 +22,7 @@ class _MainScreenState extends State<MainScreen> {
     return [
       const AlarmScreen(),
       const CalendarScreen(),
+      const ScheduleScreen(),
     ];
   }
 
@@ -35,6 +37,12 @@ class _MainScreenState extends State<MainScreen> {
       PersistentBottomNavBarItem(
         icon: const Icon(Icons.calendar_month),
         title: ("Calendar"),
+        activeColorPrimary: Colors.black,
+        inactiveColorPrimary: Colors.grey,
+      ),
+      PersistentBottomNavBarItem(
+        icon: const Icon(Icons.schedule),
+        title: ("Overview"),
         activeColorPrimary: Colors.black,
         inactiveColorPrimary: Colors.grey,
       ),
