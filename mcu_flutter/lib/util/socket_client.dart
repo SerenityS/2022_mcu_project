@@ -85,3 +85,24 @@ Future<String> removeAlarm(index) async {
   await rsts.asFuture<void>();
   return rst;
 }
+
+Future<String> getStudyData() async {
+  Socket socket = await Socket.connect("1.253.35.224", 8765);
+
+  String rst = "";
+  socket.write('{"cmd": "get_study_data"}');
+  var rsts = socket.listen(
+    (Uint8List data) async {
+      rst = String.fromCharCodes(data);
+    },
+    onError: (error) {
+      socket.destroy();
+    },
+    onDone: () {
+      socket.destroy();
+    },
+  );
+  socket.close();
+  await rsts.asFuture<void>();
+  return rst;
+}

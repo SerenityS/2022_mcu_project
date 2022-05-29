@@ -29,3 +29,14 @@ class sqllite_helper:
     def removeTime(self, index):
         self.cur.execute(f"DELETE FROM alarm WHERE no = '{index}'")
         self.conn.commit()
+
+    def getStudyData(self):
+        self.cur.execute("SELECT * FROM calendar")
+        rows = self.cur.fetchall()
+
+        study_data = []
+
+        for row in rows:
+            study_data.append(row)
+
+        return study_data

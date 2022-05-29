@@ -13,7 +13,7 @@ Widget customCard(context, text, targetScreen) {
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: () {
-          Get.to(() => const AlarmScreen());
+          Get.to(() => targetScreen());
         },
         child: SizedBox(
           width: MediaQuery.of(context).size.width * 0.95,
