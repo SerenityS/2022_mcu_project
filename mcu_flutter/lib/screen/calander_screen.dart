@@ -48,6 +48,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
             view: CalendarView.month,
             initialSelectedDate: DateTime.now(),
             dataSource: StudyDataSource(studies),
+            appointmentTimeTextFormat: 'MM/dd HH:mm:ss',
             monthViewSettings: const MonthViewSettings(
               showAgenda: true,
               agendaViewHeight: 300,
