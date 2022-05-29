@@ -49,6 +49,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
             initialSelectedDate: DateTime.now(),
             dataSource: StudyDataSource(studies),
             appointmentTimeTextFormat: 'MM/dd HH:mm:ss',
+            headerHeight: 0,
             scheduleViewSettings: const ScheduleViewSettings(
               hideEmptyScheduleWeek: true,
               appointmentTextStyle: TextStyle(height: 2),
