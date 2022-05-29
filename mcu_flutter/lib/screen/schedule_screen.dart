@@ -51,6 +51,8 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
             appointmentTimeTextFormat: 'MM/dd HH:mm:ss',
             scheduleViewSettings: const ScheduleViewSettings(
               hideEmptyScheduleWeek: true,
+              appointmentTextStyle: TextStyle(height: 2),
+              appointmentItemHeight: 63,
               monthHeaderSettings:
                   MonthHeaderSettings(backgroundColor: Colors.grey, height: 2),
             ),

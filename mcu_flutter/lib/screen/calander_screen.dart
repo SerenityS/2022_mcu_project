@@ -50,9 +50,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
             dataSource: StudyDataSource(studies),
             appointmentTimeTextFormat: 'MM/dd HH:mm:ss',
             monthViewSettings: const MonthViewSettings(
-              showAgenda: true,
-              agendaViewHeight: 300,
-            ),
+                appointmentDisplayMode: MonthAppointmentDisplayMode.appointment,
+                showAgenda: true,
+                agendaItemHeight: 63,
+                agendaStyle:
+                    AgendaStyle(appointmentTextStyle: TextStyle(height: 2))),
           );
         }
       },

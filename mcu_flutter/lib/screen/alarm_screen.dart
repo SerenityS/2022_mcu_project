@@ -45,7 +45,7 @@ class _AlarmScreenState extends State<AlarmScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(2.0),
         child: FutureBuilder(
           future: sendSocketData('{"cmd": "get_alarm"}'),
           builder: (contexts, snapshot) {
