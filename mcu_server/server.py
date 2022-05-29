@@ -60,6 +60,12 @@ if __name__ == "__main__":
                 db_helper.removeTime(index)
                 print(f"server>> remove alarm: {index}")
 
+            elif cmd == "get_study_data":
+                study_data = db_helper.getStudyData()
+                study_data_json = json.dumps(study_data)
+                print(f"server>> send calendar data: {study_data_json}")
+                client_socket.sendall(study_data_json.encode())
+
         # 소켓 통신 대기
         while True:
             client_socket, client_addr = server_socket.accept()
