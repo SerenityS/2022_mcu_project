@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:mcu/const/const.dart';
 import 'package:mcu/screen/alarm_screen.dart';
 import 'package:mcu/screen/calander_screen.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
@@ -12,6 +14,8 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   late PersistentTabController _controller;
+  final TextEditingController _ipTextController = TextEditingController();
+  final TextEditingController _portTextController = TextEditingController();
 
   List<Widget> _buildScreens() {
     return [
@@ -37,6 +41,48 @@ class _MainScreenState extends State<MainScreen> {
     ];
   }
 
+  void changeIpPortDialog() async {
+    _ipTextController.text = ipAddress;
+    _portTextController.text = port.toString();
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0)),
+            title: const Text("Change IP / Port"),
+            //
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextField(
+                  controller: _ipTextController,
+                  decoration: const InputDecoration(hintText: 'IP'),
+                ),
+                TextField(
+                  controller: _portTextController,
+                  decoration: const InputDecoration(hintText: 'PORT'),
+                ),
+              ],
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: const Text(
+                  "확인",
+                  style: TextStyle(color: Colors.black),
+                ),
+                onPressed: () {
+                  ipAddress = _ipTextController.text;
+                  port = int.parse(_portTextController.text);
+                  Get.back();
+                },
+              ),
+            ],
+          );
+        });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -48,6 +94,14 @@ class _MainScreenState extends State<MainScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("열공 무드등"),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () {
+              changeIpPortDialog();
+            },
+          ),
+        ],
       ),
       body: PersistentTabView(
         context,
