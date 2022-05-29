@@ -47,6 +47,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
             return SfCalendar(
               view: CalendarView.month,
+              initialSelectedDate: DateTime.now(),
               dataSource: MeetingDataSource(studies),
               monthViewSettings: const MonthViewSettings(
                 showAgenda: true,
