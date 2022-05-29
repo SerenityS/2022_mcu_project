@@ -44,57 +44,61 @@ class _AlarmScreenState extends State<AlarmScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: FutureBuilder(
-        future: sendSocketData('{"cmd": "get_alarm"}'),
-        builder: (contexts, snapshot) {
-          if (!snapshot.hasData) {
-            return const Center(child: CircularProgressIndicator());
-          } else {
-            var alarmData = jsonDecode(snapshot.data.toString());
-            alarmList = [];
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: FutureBuilder(
+          future: sendSocketData('{"cmd": "get_alarm"}'),
+          builder: (contexts, snapshot) {
+            if (!snapshot.hasData) {
+              return const Center(child: CircularProgressIndicator());
+            } else {
+              var alarmData = jsonDecode(snapshot.data.toString());
+              alarmList = [];
 
-            for (var alarm in alarmData) {
-              int hr = int.parse(alarm[1].toString().substring(0, 2));
-              int mn = int.parse(alarm[1].toString().substring(3, 5));
-              alarmList.add([alarm[0], TimeOfDay(hour: hr, minute: mn)]);
-            }
+              for (var alarm in alarmData) {
+                int hr = int.parse(alarm[1].toString().substring(0, 2));
+                int mn = int.parse(alarm[1].toString().substring(3, 5));
+                alarmList.add([alarm[0], TimeOfDay(hour: hr, minute: mn)]);
+              }
 
-            return SingleChildScrollView(
-              child: Column(
-                children: [
-                  for (var alarm in alarmList)
-                    Center(
-                      child: SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.95,
-                        child: Card(
-                          clipBehavior: Clip.antiAlias,
-                          child: InkWell(
-                            onTap: () {
-                              _setTime(alarm);
-                            },
-                            onLongPress: () {
-                              _deleteAlarm(alarm);
-                            },
-                            child: SizedBox(
-                              height: MediaQuery.of(context).size.height * 0.1,
-                              child: Center(
-                                child: Text(
-                                  "${NumberFormat("00").format(alarm[1].hour)}:${NumberFormat("00").format(alarm[1].minute)}",
-                                  style: const TextStyle(
-                                      fontSize: 30,
-                                      fontWeight: FontWeight.bold),
+              return SingleChildScrollView(
+                child: Column(
+                  children: [
+                    for (var alarm in alarmList)
+                      Center(
+                        child: SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.95,
+                          child: Card(
+                            clipBehavior: Clip.antiAlias,
+                            child: InkWell(
+                              onTap: () {
+                                _setTime(alarm);
+                              },
+                              onLongPress: () {
+                                _deleteAlarm(alarm);
+                              },
+                              child: SizedBox(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.1,
+                                child: Center(
+                                  child: Text(
+                                    "${NumberFormat("00").format(alarm[1].hour)}:${NumberFormat("00").format(alarm[1].minute)}",
+                                    style: const TextStyle(
+                                        fontSize: 30,
+                                        fontWeight: FontWeight.bold),
+                                  ),
                                 ),
                               ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                ],
-              ),
-            );
-          }
-        },
+                  ],
+                ),
+              );
+            }
+          },
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _addTime(),
