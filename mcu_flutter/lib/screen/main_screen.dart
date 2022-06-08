@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:mcu/const/const.dart';
 import 'package:mcu/screen/alarm_screen.dart';
 import 'package:mcu/screen/calander_screen.dart';
+import 'package:mcu/screen/remote_screen.dart';
 import 'package:mcu/screen/schedule_screen.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 
@@ -20,6 +21,7 @@ class _MainScreenState extends State<MainScreen> {
 
   List<Widget> _buildScreens() {
     return [
+      const RemoteScreen(),
       const AlarmScreen(),
       const CalendarScreen(),
       const ScheduleScreen(),
@@ -28,6 +30,12 @@ class _MainScreenState extends State<MainScreen> {
 
   List<PersistentBottomNavBarItem> _navBarsItems() {
     return [
+      PersistentBottomNavBarItem(
+        icon: const Icon(Icons.settings_remote),
+        title: ("Remote"),
+        activeColorPrimary: Colors.black,
+        inactiveColorPrimary: Colors.grey,
+      ),
       PersistentBottomNavBarItem(
         icon: const Icon(Icons.alarm),
         title: ("Alarm"),
