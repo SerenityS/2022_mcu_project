@@ -31,17 +31,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
             DateTime startTime = DateTime.parse(study[1].toString());
             DateTime endTime = DateTime.parse(study[2].toString());
             DateTime studyTime = endTime.subtract(
-              Duration(
-                  hours: startTime.hour,
-                  minutes: startTime.minute,
-                  seconds: startTime.second),
+              Duration(hours: startTime.hour, minutes: startTime.minute, seconds: startTime.second),
             );
-            studies.add(Study(
-                DateFormat('HH:mm:ss').format(studyTime).toString(),
-                startTime,
-                endTime,
-                const Color(0xFF0F8644),
-                false));
+            studies.add(Study(DateFormat('HH:mm:ss').format(studyTime).toString(), startTime, endTime, const Color(0xFF0F8644), false));
           }
 
           return SfCalendar(
@@ -51,11 +43,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
             appointmentTimeTextFormat: 'MM/dd HH:mm:ss',
             headerDateFormat: 'yyy-MM',
             monthViewSettings: const MonthViewSettings(
-                appointmentDisplayMode: MonthAppointmentDisplayMode.appointment,
-                showAgenda: true,
-                agendaItemHeight: 63,
-                agendaStyle:
-                    AgendaStyle(appointmentTextStyle: TextStyle(height: 2))),
+                showAgenda: true, agendaItemHeight: 63, agendaStyle: AgendaStyle(appointmentTextStyle: TextStyle(height: 2))),
           );
         }
       },

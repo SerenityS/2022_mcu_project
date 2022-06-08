@@ -56,10 +56,8 @@ class _MainScreenState extends State<MainScreen> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0)),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
             title: const Text("Change IP / Port"),
-            //
             content: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,

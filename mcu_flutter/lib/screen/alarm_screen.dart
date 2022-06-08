@@ -15,8 +15,7 @@ class _AlarmScreenState extends State<AlarmScreen> {
   var alarmList = [];
 
   _addTime() async {
-    TimeOfDay? timeOfDay =
-        await showTimePicker(context: context, initialTime: TimeOfDay.now());
+    TimeOfDay? timeOfDay = await showTimePicker(context: context, initialTime: TimeOfDay.now());
 
     await sendSocketData(
         '{"cmd":"add_alarm", "time": "${NumberFormat("00").format(timeOfDay?.hour)}:${NumberFormat("00").format(timeOfDay?.minute)}"}');
@@ -24,8 +23,7 @@ class _AlarmScreenState extends State<AlarmScreen> {
   }
 
   _setTime(alarm) async {
-    TimeOfDay? timeOfDay = await showTimePicker(
-        context: context, initialTime: alarm[1], useRootNavigator: false);
+    TimeOfDay? timeOfDay = await showTimePicker(context: context, initialTime: alarm[1], useRootNavigator: false);
     if (timeOfDay == null) {
       timeOfDay = TimeOfDay.now();
     } else if (timeOfDay != alarm[1] && timeOfDay != alarm[1]) {
@@ -78,14 +76,11 @@ class _AlarmScreenState extends State<AlarmScreen> {
                                 _deleteAlarm(alarm);
                               },
                               child: SizedBox(
-                                height:
-                                    MediaQuery.of(context).size.height * 0.1,
+                                height: MediaQuery.of(context).size.height * 0.1,
                                 child: Center(
                                   child: Text(
                                     "${NumberFormat("00").format(alarm[1].hour)}:${NumberFormat("00").format(alarm[1].minute)}",
-                                    style: const TextStyle(
-                                        fontSize: 30,
-                                        fontWeight: FontWeight.bold),
+                                    style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
                                   ),
                                 ),
                               ),
