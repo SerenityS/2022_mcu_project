@@ -310,10 +310,12 @@ void loop() {
 
   // Clock Screen
   if (screen == 1) {
+    checkSleep();
     printTime();
   }
   //Timer Screen
   else if (screen == 2) {
+    checkSleep();
     matrix.fillScreen(0);
     matrix.setCursor(1, 1);
     matrix.print("Timer");
@@ -328,6 +330,7 @@ void loop() {
   }
   // Temp/Hud Screen
   else if (screen == 3) {
+    checkSleep();
     float hud = dht.readHumidity();
     float temp = dht.readTemperature();
     if (!isnan(hud) || !isnan(temp)) {
@@ -341,6 +344,7 @@ void loop() {
   }
   // Brightness Screen
   else if (screen == 4) {
+    checkSleep();
     matrix.fillScreen(0);
     matrix.setCursor(1, 0);
     matrix.print("Brigh");
@@ -353,6 +357,7 @@ void loop() {
   }
   // Alarm Screen
   else if (screen == 5) {
+    checkSleep();
     analogWrite(7, 130);
     matrix.fillScreen(0);
     matrix.setCursor(1, 1);
@@ -368,6 +373,15 @@ void loop() {
 }
 
 // Functions
+
+void checkSleep() {
+  if (sleep_flag) {
+    brightness = old_brightness;
+    pixels.setBrightness(brightness);
+    pixels.show();
+    sleep_flag = false;
+  }
+}
 
 void doSleep() {
   sleep_flag = sleep_flag ? false : true;
