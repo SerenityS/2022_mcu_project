@@ -304,6 +304,10 @@ void loop() {
       t = millis();
       screen = 5;
     }
+    // Sleep Alarm Function(Not Button)
+    else if (cmd == 18) {
+      doSleep();
+    }
   }
 
   // Screens

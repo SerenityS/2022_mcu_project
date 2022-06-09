@@ -27,7 +27,7 @@ class sqllite_helper:
         return study_data
 
     def addTime(self, time):
-        self.cur.execute(f"INSERT INTO alarm (time) VALUES ('{time}')")
+        self.cur.execute(f"INSERT INTO alarm (time, sleep) VALUES ('{time}', 'N')")
         self.conn.commit()
 
     def getTime(self):
@@ -36,7 +36,7 @@ class sqllite_helper:
 
         alarm_data = []
         for row in rows:
-            alarm_data.append([row[0], row[1]])
+            alarm_data.append([row[0], row[1], row[2]])
         return alarm_data
 
     def setTime(self, index, time):

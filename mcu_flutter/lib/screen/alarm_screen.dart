@@ -22,6 +22,18 @@ class _AlarmScreenState extends State<AlarmScreen> {
     setState(() {});
   }
 
+  _setSleepTime(alarm) async {
+    TimeOfDay? timeOfDay = await showTimePicker(context: context, initialTime: alarm[1], useRootNavigator: false);
+    if (timeOfDay == null) {
+      timeOfDay = TimeOfDay.now();
+    } else if (timeOfDay != alarm[1] && timeOfDay != alarm[1]) {
+      alarm[1] = timeOfDay;
+      await sendSocketData(
+          '{"cmd": "set_alarm", "index": ${alarm[0]}, "time": "${NumberFormat("00").format(alarm[1].hour)}:${NumberFormat("00").format(alarm[1].minute)}", "sleep": "Y"}');
+      setState(() {});
+    }
+  }
+
   _setTime(alarm) async {
     TimeOfDay? timeOfDay = await showTimePicker(context: context, initialTime: alarm[1], useRootNavigator: false);
     if (timeOfDay == null) {
@@ -29,7 +41,7 @@ class _AlarmScreenState extends State<AlarmScreen> {
     } else if (timeOfDay != alarm[1] && timeOfDay != alarm[1]) {
       alarm[1] = timeOfDay;
       await sendSocketData(
-          '{"cmd": "set_alarm", "index": ${alarm[0]}, "time": "${NumberFormat("00").format(alarm[1].hour)}:${NumberFormat("00").format(alarm[1].minute)}"}');
+          '{"cmd": "set_alarm", "index": ${alarm[0]}, "time": "${NumberFormat("00").format(alarm[1].hour)}:${NumberFormat("00").format(alarm[1].minute)}", "sleep": "N"}');
       setState(() {});
     }
   }
@@ -62,7 +74,29 @@ class _AlarmScreenState extends State<AlarmScreen> {
               return SingleChildScrollView(
                 child: Column(
                   children: [
-                    for (var alarm in alarmList)
+                    Center(
+                      child: SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.95,
+                        child: Card(
+                          clipBehavior: Clip.antiAlias,
+                          child: InkWell(
+                            onTap: () {
+                              _setTime(alarmList[0]);
+                            },
+                            child: SizedBox(
+                              height: MediaQuery.of(context).size.height * 0.1,
+                              child: Center(
+                                child: Text(
+                                  " ${NumberFormat("00").format(alarmList[0][1].hour)}:${NumberFormat("00").format(alarmList[0][1].minute)}(Sleep)",
+                                  style: const TextStyle(color: Colors.redAccent, fontSize: 30, fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    for (var i = 1; i < alarmList.length; i++)
                       Center(
                         child: SizedBox(
                           width: MediaQuery.of(context).size.width * 0.95,
@@ -70,16 +104,16 @@ class _AlarmScreenState extends State<AlarmScreen> {
                             clipBehavior: Clip.antiAlias,
                             child: InkWell(
                               onTap: () {
-                                _setTime(alarm);
+                                _setTime(alarmList[i]);
                               },
                               onLongPress: () {
-                                _deleteAlarm(alarm);
+                                _deleteAlarm(alarmList[i]);
                               },
                               child: SizedBox(
                                 height: MediaQuery.of(context).size.height * 0.1,
                                 child: Center(
                                   child: Text(
-                                    "${NumberFormat("00").format(alarm[1].hour)}:${NumberFormat("00").format(alarm[1].minute)}",
+                                    "${NumberFormat("00").format(alarmList[i][1].hour)}:${NumberFormat("00").format(alarmList[i][1].minute)}",
                                     style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
                                   ),
                                 ),

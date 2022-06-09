@@ -18,10 +18,14 @@ def alertAlarm():
 
     now = time_lib.strftime("%H:%M", time_lib.localtime(time_lib.time()))
     for alarm in alarm_data:
-        if alarm[1] == now and alarm[1] != latest_alarm:
+        if alarm[1] == now and alarm[1] != latest_alarm and alarm[2] == "N":
             print("server>> alert Alarm!")
             latest_alarm = now
             ard_ctl.sendSerialCmd(15)
+        elif alarm[1] == now and alarm[1] != latest_alarm and alarm[2] == "Y":
+            print("server>> Sleep")
+            latest_alarm = now
+            ard_ctl.sendSerialCmd(16)
     threading.Timer(1, alertAlarm).start()
 
 
