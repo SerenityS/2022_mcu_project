@@ -137,6 +137,34 @@ void loop() {
     }
     else if (results.value == 0xFFC23D) {
       timer_flag = timer_flag ? false : true;
+      if (!timer_flag) {
+        RtcDateTime now = Rtc.GetDateTime();
+
+        Serial.print("S,");
+        Serial.print(start.Year());
+        Serial.print("-");
+        Serial.print(start.Month());
+        Serial.print("-");
+        Serial.print(start.Day());
+        Serial.print(" ");
+        Serial.print(start.Hour());
+        Serial.print(":");
+        Serial.print(start.Minute());
+        Serial.print(":");
+        Serial.print(start.Second());
+        Serial.print(",");
+        Serial.print(now.Year());
+        Serial.print("-");
+        Serial.print(now.Month());
+        Serial.print("-");
+        Serial.print(now.Day());
+        Serial.print(" ");
+        Serial.print(now.Hour());
+        Serial.print(":");
+        Serial.print(now.Minute());
+        Serial.print(":");
+        Serial.print(now.Second());
+      }
       mode = 2;
     }
     else if (results.value == 0xFFE01F) {
@@ -187,6 +215,32 @@ void loop() {
     else if (cmd == 7) {
       if (timer_flag) {
         timer_flag = timer_flag ? false : true;
+        RtcDateTime now = Rtc.GetDateTime();
+
+        Serial.print("S,");
+        Serial.print(start.Year());
+        Serial.print("-");
+        Serial.print(start.Month());
+        Serial.print("-");
+        Serial.print(start.Day());
+        Serial.print(" ");
+        Serial.print(start.Hour());
+        Serial.print(":");
+        Serial.print(start.Minute());
+        Serial.print(":");
+        Serial.print(start.Second());
+        Serial.print(",");
+        Serial.print(now.Year());
+        Serial.print("-");
+        Serial.print(now.Month());
+        Serial.print("-");
+        Serial.print(now.Day());
+        Serial.print(" ");
+        Serial.print(now.Hour());
+        Serial.print(":");
+        Serial.print(now.Minute());
+        Serial.print(":");
+        Serial.print(now.Second());
       }
       mode = 2;
     }
@@ -247,11 +301,11 @@ void loop() {
     if (!isnan(hud) || !isnan(temp)) {
       matrix.fillScreen(0);
       matrix.setCursor(1, 1);
-      matrix.print(hud);
-      matrix.setCursor(1, 9);
       matrix.print(temp);
-      delay(20);
+      matrix.setCursor(1, 9);
+      matrix.print(hud);
     }
+    delay(20);
   }
   else if (mode == 4) {
     matrix.fillScreen(0);
@@ -280,25 +334,7 @@ void loop() {
 
 #define countof(a) (sizeof(a) / sizeof(a[0]))
 
-void printDateTime(const RtcDateTime& dt)
-{
-  char datestring[20];
-
-  snprintf_P(datestring,
-             countof(datestring),
-             PSTR("%04u,%02u,%02u,%02u,%02u,%02u"),
-             dt.Year(),
-             dt.Month(),
-             dt.Day(),
-             dt.Hour(),
-             dt.Minute(),
-             dt.Second()
-            );
-  Serial.println(datestring);
-}
-
-
-void printTime(const RtcDateTime& dt)
+void printTime(const RtcDateTime & dt)
 {
   char datestring[20];
 
@@ -330,7 +366,7 @@ void printTime(const RtcDateTime& dt)
   matrix.print(datestring);
 }
 
-void printTimer(const RtcDateTime& dt)
+void printTimer(const RtcDateTime & dt)
 {
   char datestring[20];
   int mn = dt / 60;
