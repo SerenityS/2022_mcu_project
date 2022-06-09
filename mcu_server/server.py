@@ -1,4 +1,4 @@
-import datetime
+# Include Libraries
 import json
 import socket
 import threading
@@ -12,6 +12,7 @@ ard_ctl = ArduinoController()
 db_helper = sqllite_helper()
 
 
+# Alert Alarm
 def alertAlarm():
     global latest_alarm
 
@@ -20,43 +21,47 @@ def alertAlarm():
         if alarm[1] == now and alarm[1] != latest_alarm:
             print("server>> alert Alarm!")
             latest_alarm = now
-            ard_ctl.sendRemoteCmd(15)
+            ard_ctl.sendSerialCmd(15)
     threading.Timer(1, alertAlarm).start()
 
 
-def getStudyData():
-    response = ard_ctl.getMessage()
+# Get Command from Serial Commnincation
+def getSerialCmd():
+    response = ard_ctl.getSerialCmd()
     if response != "":
-        print(f"arduino>> {response}")
+        print(f"arduino>> {response}", end="")
         if response[0] == "S":
-            cmd, start, end = response.split(",")
-            start = datetime.datetime.strptime(start, "%Y-%m-%d %H:%M:%S")
-            end = datetime.datetime.strptime(end, "%Y-%m-%d %H:%M:%S")
-            db_helper.addSchedule(start, end)
+            _, start, end = response.split(",")
+            db_helper.addStudyData(start, end.replace("\r\n", ""))
+            print("server>> Add Study data")
 
-    threading.Timer(1, getStudyData).start()
+    threading.Timer(1, getSerialCmd).start()
 
 
 if __name__ == "__main__":
+    # Define global variables
     global alarm_data
     global latest_alarm
 
+    # For Alarm Function
     alarm_data = db_helper.getTime()
     latest_alarm = time_lib.strftime("%H:%M", time_lib.localtime(time_lib.time()))
 
+    # Thread Control
     alertAlarm()
-    getStudyData()
+    getSerialCmd()
 
     # Socket Stream Open
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
         server_socket.bind((serverIp, serverPort))
         server_socket.listen()
 
-        def getCmd(cmd):
+        def getSocketCmd(cmd):
             global alarm_data
-
             cmd_json = json.loads(cmd)
             cmd = cmd_json["cmd"]
+
+            # Alarm Related Functions
             if cmd == "add_alarm":
                 time = cmd_json["time"]
                 db_helper.addTime(time)
@@ -78,24 +83,26 @@ if __name__ == "__main__":
                 db_helper.removeTime(index)
                 print(f"server>> remove alarm: {index}")
 
+            # Calander Related Function
             elif cmd == "get_study_data":
                 study_data = db_helper.getStudyData()
                 study_data_json = json.dumps(study_data)
                 print(f"server>> send calendar data: {study_data_json}")
                 client_socket.sendall(study_data_json.encode())
 
+            # Remote Related Function
             elif cmd == "remote":
                 index = cmd_json["index"]
-                ard_ctl.sendRemoteCmd(index)
+                ard_ctl.sendSerialCmd(index)
 
-        # 소켓 통신 대기
+        # Wait Socket Commnunication
         while True:
             client_socket, client_addr = server_socket.accept()
-            # 클라이언트로부터 전달 받은 명령어 해독
+            # Decode Command
             cmd = client_socket.recv(1024).decode("utf-8")
-            # 명령어 출력
+            # Print command
             print(f"client>> {cmd}")
-            # 명령어에 따른 명령 처리
-            getCmd(cmd)
-            # 클라이언트 소켓 닫음
+            # Run Command
+            getSocketCmd(cmd)
+            # Close Client Socket
             client_socket.close()

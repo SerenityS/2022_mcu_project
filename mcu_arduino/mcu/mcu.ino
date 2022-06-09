@@ -1,28 +1,33 @@
-// Include Libraries
-#include <Adafruit_NeoPixel.h>
-
+// Include DHT11
 #include <Adafruit_Sensor.h>
 #include "DHT.h"
 
-#include <RGBmatrixPanel.h>
-
+// Include DS1302
 #include <ThreeWire.h>
 #include <RtcDS1302.h>
+
+// Include RGB Matrix
+#include <RGBmatrixPanel.h>
+
+// Include IRremote
+#include <IRremote.h>
+
+// Include WS2812
+#include <Adafruit_NeoPixel.h>
 
 #ifdef __AVR__
 #include <avr/power.h>
 #endif
-
-#include <IRremote.h>
 
 // Define DHT11
 #define DHT11_PIN 12
 #define DHTTYPE DHT11
 DHT dht(DHT11_PIN, DHTTYPE);
 
-// Define RTC
-ThreeWire myWire(4, 5, 2); // IO, SCLK, CE
-RtcDS1302<ThreeWire> Rtc(myWire);
+// Define IRremote
+int RECV_PIN = 22;
+IRrecv irrecv(RECV_PIN);
+decode_results results;
 
 // Define RGB Led Matrix
 #define CLK 11
@@ -32,31 +37,42 @@ RtcDS1302<ThreeWire> Rtc(myWire);
 #define B   A1
 #define C   A2
 
-// Define IRremote
-int RECV_PIN = 22;
-IRrecv irrecv(RECV_PIN);
-decode_results results;
-
 RGBmatrixPanel matrix(A, B, C, CLK, LAT, OE, true);
+
+#define countof(a) (sizeof(a) / sizeof(a[0]))
+
+// Define RTC
+ThreeWire myWire(4, 5, 2); // IO, SCLK, CE
+RtcDS1302<ThreeWire> Rtc(myWire);
 
 // Define WS2812
 #define PIN       13
 #define NUMPIXELS 24
 
 Adafruit_NeoPixel pixels(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
-#define DELAYVAL 500
+
 int brightness = 51;
 int old_brightness = 51;
 
-unsigned long t;
-
 void setup() {
+  // Begin Serial Commnication
   Serial.begin(9600);
 
   // Initialize DHT11
   dht.begin();
   dht.readHumidity();
   dht.readTemperature();
+
+  // Initialize IRremote
+  irrecv.enableIRIn();
+
+  // Initalize Piezo
+  pinMode(7, OUTPUT);
+  analogWrite(7, 0);
+
+  // Initialize RGB LED Matrix
+  matrix.begin();
+  matrix.setTextSize(1);
 
   // Initialize RTC
   Rtc.Begin();
@@ -69,13 +85,6 @@ void setup() {
     Rtc.SetIsRunning(true);
   }
 
-  // Initialize IRremote
-  irrecv.enableIRIn(); // Start the receiver
-
-  // Initialize LED Matrix
-  matrix.begin();
-  matrix.setTextSize(1);
-
   // Initialize WS2812
   pixels.begin();
   pixels.setBrightness(brightness);
@@ -84,20 +93,20 @@ void setup() {
   }
   pixels.show();
 
-  // Initalize Piezo
-  pinMode(7, OUTPUT);
-  analogWrite(7, 0);
-
+  // All Modules are READY
   Serial.println("Arduino Ready!!");
 }
 
-int old_mode = 1;
-int mode = 1;
+// Declare Global Variable
+int old_screen = 1;
+int screen = 1;
+
 boolean timer_flag = false;
 boolean sleep_flag = false;
 
+unsigned long t;
+
 RtcDateTime start = Rtc.GetDateTime();
-RtcDateTime pause = Rtc.GetDateTime();
 RtcDateTime end = Rtc.GetDateTime();
 
 void print_brightness() {
@@ -107,85 +116,60 @@ void print_brightness() {
 }
 
 void loop() {
+  // Disable Piezo
   analogWrite(7, 0);
+
+  // Get Remote Controller
   if (irrecv.decode(&results)) {
+
+    // Sleep Button(CH)
     if (results.value == 0xFF629D) {
-      sleep_flag = sleep_flag ? false : true;
-      if (!sleep_flag) {
-        mode = old_mode;
-        brightness = old_brightness;
-        pixels.setBrightness(brightness);
-        pixels.show();
-      }
-      else {
-        old_mode = mode;
-        mode = 0;
-        old_brightness = brightness;
-        brightness = 1;
-        pixels.setBrightness(brightness);
-        pixels.show();
-        matrix.fillScreen(0);
-      }
+      doSleep();
     }
-    if (results.value == 0xFF30CF) {
-      mode = 1;
-    }
-    else if (results.value == 0xFF18E7) {
-      mode = 2;
-    }
-    else if (results.value == 0xFF7A85) {
-      mode = 3;
-    }
+    // Play/Pause Button
     else if (results.value == 0xFFC23D) {
       timer_flag = timer_flag ? false : true;
       if (!timer_flag) {
-        RtcDateTime now = Rtc.GetDateTime();
-
-        Serial.print("S,");
-        Serial.print(start.Year());
-        Serial.print("-");
-        Serial.print(start.Month());
-        Serial.print("-");
-        Serial.print(start.Day());
-        Serial.print(" ");
-        Serial.print(start.Hour());
-        Serial.print(":");
-        Serial.print(start.Minute());
-        Serial.print(":");
-        Serial.print(start.Second());
-        Serial.print(",");
-        Serial.print(now.Year());
-        Serial.print("-");
-        Serial.print(now.Month());
-        Serial.print("-");
-        Serial.print(now.Day());
-        Serial.print(" ");
-        Serial.print(now.Hour());
-        Serial.print(":");
-        Serial.print(now.Minute());
-        Serial.print(":");
-        Serial.print(now.Second());
+        sendStudyData();
       }
-      mode = 2;
+      screen = 2;
     }
+    // - Button
     else if (results.value == 0xFFE01F) {
       brightness -= 25;
       if (brightness < 1) brightness = 1;
-      mode = 4;
+      screen = 4;
       print_brightness();
     }
+    // + Button
     else if (results.value == 0xFFA857) {
       brightness += 25;
       if (brightness > 226) brightness = 226;
-      mode = 4;
+      screen = 4;
       print_brightness();
+    }
+    // Button 1
+    else if (results.value == 0xFF30CF) {
+      screen = 1;
+    }
+    // Button 2
+    else if (results.value == 0xFF18E7) {
+      screen = 2;
+    }
+    // Button 3
+    else if (results.value == 0xFF7A85) {
+      screen = 3;
     }
     irrecv.resume();
   }
 
+  // Serial Commnunication From Client(PC/Android)
   if (Serial.available()) {
+
+    // Get Command
     int cmd = Serial.parseInt();
 
+    // Update RTC Clock
     if (cmd == 1) {
       int yr = Serial.parseInt();
       int mon = Serial.parseInt();
@@ -195,108 +179,80 @@ void loop() {
       int sec = Serial.parseInt();
       Rtc.SetDateTime(RtcDateTime(yr, mon, day, hr, mn, sec));
     }
+    // Play Button
     else if (cmd == 4) {
       if (!timer_flag) {
         timer_flag = timer_flag ? false : true;
       }
-      mode = 2;
+      screen = 2;
     }
+    // - Button
     else if (cmd == 5) {
       brightness -= 25;
       if (brightness < 1) brightness = 1;
-      mode = 4;
+      screen = 4;
       print_brightness();
     }
+    // + Button
     else if (cmd == 6) {
       brightness += 25;
       if (brightness > 226) brightness = 226;
-      mode = 4;
+      screen = 4;
       print_brightness();
     }
+    // Pause Button
     else if (cmd == 7) {
       if (timer_flag) {
         timer_flag = timer_flag ? false : true;
-        RtcDateTime now = Rtc.GetDateTime();
-
-        Serial.print("S,");
-        Serial.print(start.Year());
-        Serial.print("-");
-        Serial.print(start.Month());
-        Serial.print("-");
-        Serial.print(start.Day());
-        Serial.print(" ");
-        Serial.print(start.Hour());
-        Serial.print(":");
-        Serial.print(start.Minute());
-        Serial.print(":");
-        Serial.print(start.Second());
-        Serial.print(",");
-        Serial.print(now.Year());
-        Serial.print("-");
-        Serial.print(now.Month());
-        Serial.print("-");
-        Serial.print(now.Day());
-        Serial.print(" ");
-        Serial.print(now.Hour());
-        Serial.print(":");
-        Serial.print(now.Minute());
-        Serial.print(":");
-        Serial.print(now.Second());
+        sendStudyData();
       }
-      mode = 2;
+      screen = 2;
     }
+    // Button 1
     else if (cmd == 8) {
-      mode = 1;
+      screen = 1;
     }
+    // Button 2
     else if (cmd == 9) {
-      mode = 2;
+      screen = 2;
     }
+    // Button 3
     else if (cmd == 10) {
-      mode = 3;
+      screen = 3;
     }
+    // Sleep Button
     else if (cmd == 16) {
-      sleep_flag = sleep_flag ? false : true;
-      if (!sleep_flag) {
-        mode = old_mode;
-        brightness = old_brightness;
-        pixels.setBrightness(brightness);
-        pixels.show();
-      }
-      else {
-        old_mode = mode;
-        mode = 0;
-        old_brightness = brightness;
-        brightness = 1;
-        pixels.setBrightness(brightness);
-        pixels.show();
-        matrix.fillScreen(0);
-      }
+      doSleep();
     }
+    // Alarm Function(Not Button)
     else if (cmd == 17) {
       t = millis();
-      mode = 5;
+      screen = 5;
     }
-    Serial.read();
   }
-  if (mode == 1) {
-    matrix.fillScreen(0);
-    matrix.setCursor(1, 1);
-    printTime(Rtc.GetDateTime());
+
+  // Screens
+
+  // Clock Screen
+  if (screen == 1) {
+    printTime();
   }
-  else if (mode == 2) {
+  //Timer Screen
+  else if (screen == 2) {
     matrix.fillScreen(0);
     matrix.setCursor(1, 1);
     matrix.print("Timer");
     matrix.setCursor(1, 9);
     if (timer_flag == true) {
-      printTimer(Rtc.GetDateTime() - start);
+      printTimer();
     }
     else {
       start = Rtc.GetDateTime();
       matrix.print("00:00");
     }
   }
-  else if (mode == 3) {
+  // Temp/Hud Screen
+  else if (screen == 3) {
     float hud = dht.readHumidity();
     float temp = dht.readTemperature();
     if (!isnan(hud) || !isnan(temp)) {
@@ -308,7 +264,8 @@ void loop() {
     }
     delay(20);
   }
-  else if (mode == 4) {
+  // Brightness Screen
+  else if (screen == 4) {
     matrix.fillScreen(0);
     matrix.setCursor(1, 0);
     matrix.print("Brigh");
@@ -316,11 +273,12 @@ void loop() {
     matrix.print("t: ");
     matrix.print((brightness / 25) % 10 + 1);
     if (millis() - t > 5000) {
-      mode = 1;
+      screen = 1;
     }
   }
-  else if (mode == 5) {
-    analogWrite(7, 100);
+  // Alarm Screen
+  else if (screen == 5) {
+    analogWrite(7, 130);
     matrix.fillScreen(0);
     matrix.setCursor(1, 1);
     matrix.print("Alarm");
@@ -328,18 +286,67 @@ void loop() {
     matrix.print("!!!!!");
     if (millis() - t > 5000) {
       analogWrite(7, 0);
-      mode = 1;
+      screen = 1;
     }
   }
   matrix.swapBuffers(true);
 }
 
-#define countof(a) (sizeof(a) / sizeof(a[0]))
+// Functions
 
-void printTime(const RtcDateTime & dt)
+void doSleep() {
+  sleep_flag = sleep_flag ? false : true;
+  if (!sleep_flag) {
+    screen = old_screen;
+    brightness = old_brightness;
+    pixels.setBrightness(brightness);
+    pixels.show();
+  }
+  else {
+    old_screen = screen;
+    screen = 0;
+    old_brightness = brightness;
+    brightness = 1;
+    pixels.setBrightness(brightness);
+    pixels.show();
+    matrix.fillScreen(0);
+  }
+}
+
+// Send Study data to Server
+void sendStudyData() {
+  char studyString[50];
+
+  RtcDateTime now = Rtc.GetDateTime();
+
+  snprintf_P(studyString,
+             countof(studyString),
+             PSTR("S,%04u-%02u-%02u %02u:%02u:%02u,%04u-%02u-%02u %02u:%02u:%02u"),
+             start.Year(),
+             start.Month(),
+             start.Day(),
+             start.Hour(),
+             start.Minute(),
+             start.Second(),
+             now.Year(),
+             now.Month(),
+             now.Day(),
+             now.Hour(),
+             now.Minute(),
+             now.Second()
+            );
+  Serial.println(studyString);
+}
+
+// Print Time with blinking
+void printTime()
 {
   char datestring[20];
 
+  RtcDateTime dt = Rtc.GetDateTime();
+
+  matrix.fillScreen(0);
+  matrix.setCursor(1, 1);
   snprintf_P(datestring,
              countof(datestring),
              PSTR("%02u/%02u"),
@@ -368,9 +375,13 @@ void printTime(const RtcDateTime & dt)
   matrix.print(datestring);
 }
 
-void printTimer(const RtcDateTime & dt)
+// Print Timer with blinking
+void printTimer()
 {
   char datestring[20];
+
+  RtcDateTime dt = Rtc.GetDateTime() - start;
+
   int mn = dt / 60;
 
   if (dt % 2) {
