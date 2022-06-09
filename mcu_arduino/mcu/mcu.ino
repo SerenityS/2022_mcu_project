@@ -110,12 +110,6 @@ unsigned long t;
 RtcDateTime start = Rtc.GetDateTime();
 RtcDateTime end = Rtc.GetDateTime();
 
-void print_brightness() {
-  t = millis();
-  pixels.setBrightness(brightness);
-  pixels.show();
-}
-
 void loop() {
   // Disable Piezo
   analogWrite(7, 0);
@@ -177,14 +171,14 @@ void loop() {
       brightness -= 25;
       if (brightness < 1) brightness = 1;
       screen = 4;
-      print_brightness();
+      set_brightness();
     }
     // + Button
     else if (results.value == 0xFFA857) {
       brightness += 25;
       if (brightness > 226) brightness = 226;
       screen = 4;
-      print_brightness();
+      set_brightness();
     }
     // Button 1
     else if (results.value == 0xFF30CF) {
@@ -266,14 +260,14 @@ void loop() {
       brightness -= 25;
       if (brightness < 1) brightness = 1;
       screen = 4;
-      print_brightness();
+      set_brightness();
     }
     // + Button
     else if (cmd == 6) {
       brightness += 25;
       if (brightness > 226) brightness = 226;
       screen = 4;
-      print_brightness();
+      set_brightness();
     }
     // Pause Button
     else if (cmd == 7) {
@@ -429,6 +423,13 @@ void sendStudyData() {
              now.Second()
             );
   Serial.println(studyString);
+}
+
+// Set Brightness
+void set_brightness() {
+  t = millis();
+  pixels.setBrightness(brightness);
+  pixels.show();
 }
 
 // Print Time with blinking
