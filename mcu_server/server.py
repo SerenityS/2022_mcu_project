@@ -3,9 +3,11 @@ import socket
 import threading
 import time as time_lib
 
+from arduino_controller import ArduinoController
 from const import serverIp, serverPort
 from sqlite3_helper import sqllite_helper
 
+ard_ctl = ArduinoController()
 db_helper = sqllite_helper()
 
 
@@ -65,6 +67,10 @@ if __name__ == "__main__":
                 study_data_json = json.dumps(study_data)
                 print(f"server>> send calendar data: {study_data_json}")
                 client_socket.sendall(study_data_json.encode())
+
+            elif cmd == "remote":
+                index = cmd_json["index"]
+                ard_ctl.sendRemoteCmd(index)
 
         # 소켓 통신 대기
         while True:

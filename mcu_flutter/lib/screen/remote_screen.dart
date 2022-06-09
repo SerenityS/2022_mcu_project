@@ -16,11 +16,12 @@ class _RemoteScreenState extends State<RemoteScreen> {
     const Icon(Icons.remove, color: Colors.white, size: 40),
     const Icon(Icons.add, color: Colors.white, size: 40),
     const Icon(Icons.pause, color: Colors.white, size: 40),
-    for (int i = 1; i < 10; i++)
+    for (int i = 1; i < 9; i++)
       Text(
         i.toString(),
         style: const TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.bold),
       ),
+    const Icon(Icons.power_settings_new, color: Colors.white, size: 40)
   ];
 
   final bgColor = [
@@ -30,7 +31,8 @@ class _RemoteScreenState extends State<RemoteScreen> {
     Colors.blue,
     Colors.blue,
     Colors.green,
-    for (int i = 1; i < 10; i++) const Color.fromARGB(75, 0, 0, 0)
+    for (int i = 1; i < 9; i++) const Color.fromARGB(75, 0, 0, 0),
+    Colors.red
   ];
   @override
   Widget build(BuildContext context) {
@@ -49,7 +51,7 @@ class _RemoteScreenState extends State<RemoteScreen> {
           itemBuilder: (BuildContext context, int index) {
             return ElevatedButton(
               onPressed: () {
-                sendSocketData('{"cmd": "remove_alarm", "index": $index}');
+                sendSocketData('{"cmd": "remote", "index": $index}');
               },
               style: ElevatedButton.styleFrom(
                 primary: bgColor[index],
