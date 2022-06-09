@@ -54,6 +54,8 @@ Adafruit_NeoPixel pixels(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 int brightness = 51;
 int old_brightness = 51;
 
+int screen = 1;
+
 void setup() {
   // Begin Serial Commnication
   Serial.begin(9600);
@@ -99,7 +101,6 @@ void setup() {
 
 // Declare Global Variable
 int old_screen = 1;
-int screen = 1;
 
 boolean timer_flag = false;
 boolean sleep_flag = false;
@@ -125,6 +126,40 @@ void loop() {
     // Sleep Button(CH)
     if (results.value == 0xFF629D) {
       doSleep();
+    }
+    // RW Button
+    else if (results.value == 0xFF22DD) {
+      switch (screen) {
+        case 1:
+          screen = 3;
+          break;
+        case 2:
+          screen = 1;
+          break;
+        case 3:
+          screen = 2;
+          break;
+        default:
+          screen = 1;
+          break;
+      }
+    }
+    // FF Button
+    else if (results.value == 0xFF02FD) {
+      switch (screen) {
+        case 1:
+          screen = 2;
+          break;
+        case 2:
+          screen = 3;
+          break;
+        case 3:
+          screen = 1;
+          break;
+        default:
+          screen = 1;
+          break;
+      }
     }
     // Play/Pause Button
     else if (results.value == 0xFFC23D) {
@@ -181,6 +216,40 @@ void loop() {
       int mn = Serial.parseInt();
       int sec = Serial.parseInt();
       Rtc.SetDateTime(RtcDateTime(yr, mon, day, hr, mn, sec));
+    }
+    // RW Button
+    else if (cmd == 2) {
+      switch (screen) {
+        case 1:
+          screen = 3;
+          break;
+        case 2:
+          screen = 1;
+          break;
+        case 3:
+          screen = 2;
+          break;
+        default:
+          screen = 1;
+          break;
+      }
+    }
+    // FF Button
+    else if (cmd == 3) {
+      switch (screen) {
+        case 1:
+          screen = 2;
+          break;
+        case 2:
+          screen = 3;
+          break;
+        case 3:
+          screen = 1;
+          break;
+        default:
+          screen = 1;
+          break;
+      }
     }
     // Play Button
     else if (cmd == 4) {
