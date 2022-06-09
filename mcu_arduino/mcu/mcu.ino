@@ -132,6 +132,9 @@ void loop() {
       if (!timer_flag) {
         sendStudyData();
       }
+      else {
+        start = Rtc.GetDateTime();
+      }
       screen = 2;
     }
     // - Button
@@ -183,6 +186,9 @@ void loop() {
     else if (cmd == 4) {
       if (!timer_flag) {
         timer_flag = timer_flag ? false : true;
+      }
+      else {
+        start = Rtc.GetDateTime();
       }
       screen = 2;
     }
