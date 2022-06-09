@@ -97,7 +97,10 @@ class _AlarmScreenState extends State<AlarmScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _addTime(),
-        child: const Icon(Icons.add),
+        child: const Icon(
+          Icons.add,
+          color: Colors.white,
+        ),
       ),
     );
   }
