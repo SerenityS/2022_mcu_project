@@ -14,43 +14,62 @@ class ScheduleScreen extends StatefulWidget {
 }
 
 class _ScheduleScreenState extends State<ScheduleScreen> {
+  final List<Study> studies = <Study>[];
+
+  Future<String> _getSchedule() async {
+    var rst = await sendSocketData('{"cmd": "get_study_data"}');
+    return rst;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: sendSocketData('{"cmd": "get_study_data"}'),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        } else {
-          final List<Study> studies = <Study>[];
-          var studyData = jsonDecode(snapshot.data.toString());
-
-          for (var study in studyData) {
-            DateTime startTime = DateTime.parse(study[1].toString());
-            DateTime endTime = DateTime.parse(study[2].toString());
-            DateTime studyTime = endTime.subtract(
-              Duration(hours: startTime.hour, minutes: startTime.minute, seconds: startTime.second),
+    return Scaffold(
+      body: FutureBuilder(
+        future: _getSchedule(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return const Center(
+              child: CircularProgressIndicator(),
             );
-            studies.add(Study(DateFormat('HH:mm:ss').format(studyTime).toString(), startTime, endTime, const Color(0xFF0F8644), false));
-          }
+          } else {
+            studies.clear();
+            var studyData = jsonDecode(snapshot.data.toString());
 
-          return SfCalendar(
-            view: CalendarView.schedule,
-            initialSelectedDate: DateTime.now(),
-            dataSource: StudyDataSource(studies),
-            appointmentTimeTextFormat: 'MM/dd HH:mm:ss',
-            headerHeight: 0,
-            scheduleViewSettings: const ScheduleViewSettings(
-              hideEmptyScheduleWeek: true,
-              appointmentTextStyle: TextStyle(height: 2),
-              appointmentItemHeight: 63,
-              monthHeaderSettings: MonthHeaderSettings(backgroundColor: Colors.grey, height: 2),
-            ),
-          );
-        }
-      },
+            for (var study in studyData) {
+              DateTime startTime = DateTime.parse(study[1].toString());
+              DateTime endTime = DateTime.parse(study[2].toString());
+              DateTime studyTime = endTime.subtract(
+                Duration(hours: startTime.hour, minutes: startTime.minute, seconds: startTime.second),
+              );
+              studies.add(Study(DateFormat('HH:mm:ss').format(studyTime).toString(), startTime, endTime, const Color(0xFF0F8644), false));
+            }
+
+            return SfCalendar(
+              view: CalendarView.schedule,
+              initialSelectedDate: DateTime.now(),
+              dataSource: StudyDataSource(studies),
+              appointmentTimeTextFormat: 'MM/dd HH:mm:ss',
+              headerHeight: 0,
+              scheduleViewSettings: const ScheduleViewSettings(
+                hideEmptyScheduleWeek: true,
+                appointmentTextStyle: TextStyle(height: 2),
+                appointmentItemHeight: 63,
+                monthHeaderSettings: MonthHeaderSettings(backgroundColor: Colors.grey, height: 2),
+              ),
+            );
+          }
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          _getSchedule();
+          setState(() {});
+        },
+        child: const Icon(
+          Icons.refresh,
+          color: Colors.white,
+        ),
+      ),
     );
   }
 }
