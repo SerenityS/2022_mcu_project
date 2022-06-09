@@ -102,6 +102,7 @@ void setup() {
 // Declare Global Variable
 int old_screen = 1;
 
+boolean fever_flag = false;
 boolean timer_flag = false;
 boolean sleep_flag = false;
 
@@ -113,6 +114,15 @@ RtcDateTime end = Rtc.GetDateTime();
 void loop() {
   // Disable Piezo
   analogWrite(7, 0);
+
+  // Change LED Color when study 10sec for test
+  if (Rtc.GetDateTime() - start >= 10 && !fever_flag && !sleep_flag) {
+    fever_flag = true;
+    for (int i = 0; i < 24; i++) {
+      pixels.setPixelColor(i, 255, 0, 0);
+    }
+    pixels.show();
+  }
 
   // Get Remote Controller
   if (irrecv.decode(&results)) {
@@ -159,6 +169,11 @@ void loop() {
     else if (results.value == 0xFFC23D) {
       timer_flag = timer_flag ? false : true;
       if (!timer_flag) {
+        fever_flag = false;
+        for (int i = 0; i < 24; i++) {
+          pixels.setPixelColor(i, 255, 255, 255);
+        }
+        pixels.show();
         sendStudyData();
       }
       else {
@@ -272,7 +287,12 @@ void loop() {
     // Pause Button
     else if (cmd == 7) {
       if (timer_flag) {
+        fever_flag = false;
         timer_flag = timer_flag ? false : true;
+        for (int i = 0; i < 24; i++) {
+          pixels.setPixelColor(i, 255, 255, 255);
+        }
+        pixels.show();
         sendStudyData();
       }
       screen = 2;
@@ -390,11 +410,15 @@ void doSleep() {
     pixels.show();
   }
   else {
+    fever_flag = false;
     old_screen = screen;
     screen = 0;
     old_brightness = brightness;
     brightness = 1;
     pixels.setBrightness(brightness);
+    for (int i = 0; i < 24; i++) {
+      pixels.setPixelColor(i, 255, 255, 255);
+    }
     pixels.show();
     matrix.fillScreen(0);
   }
