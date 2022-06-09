@@ -7,6 +7,12 @@ class sqllite_helper:
         self.conn = sqlite3.connect(os.getcwd() + "/db/mcu.db", check_same_thread=False)
         self.cur = self.conn.cursor()
 
+    def addSchedule(self, start, end):
+        self.cur.execute(
+            f"INSERT INTO calendar (start_time, end_time) VALUES ('{start}', '{end}')"
+        )
+        self.conn.commit()
+
     def addTime(self, time):
         self.cur.execute(f"INSERT INTO alarm (time) VALUES ('{time}')")
         self.conn.commit()

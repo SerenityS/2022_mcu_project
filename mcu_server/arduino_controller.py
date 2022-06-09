@@ -1,4 +1,5 @@
 import datetime
+import re
 import sys
 import time
 
@@ -32,3 +33,7 @@ class ArduinoController:
         cmd = f"{index + 2}"
         self.ser.write(bytes(cmd, "utf-8"))
         print(f"server>> Send Remote Command")
+
+    def getMessage(self):
+        if self.ser.readable():
+            return self.ser.readline().decode()

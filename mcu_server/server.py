@@ -1,3 +1,4 @@
+import datetime
 import json
 import socket
 import threading
@@ -22,6 +23,19 @@ def alertAlarm():
     threading.Timer(1, alertAlarm).start()
 
 
+def getStudyData():
+    response = ard_ctl.getMessage()
+    if response != "":
+        print(f"arduino>> {response}")
+        if response[0] == "S":
+            cmd, start, end = response.split(",")
+            start = datetime.datetime.strptime(start, "%Y-%m-%d %H:%M:%S")
+            end = datetime.datetime.strptime(end, "%Y-%m-%d %H:%M:%S")
+            db_helper.addSchedule(start, end)
+
+    threading.Timer(1, getStudyData).start()
+
+
 if __name__ == "__main__":
     global alarm_data
     global latest_alarm
@@ -30,6 +44,7 @@ if __name__ == "__main__":
     latest_alarm = time_lib.strftime("%H:%M", time_lib.localtime(time_lib.time()))
 
     alertAlarm()
+    getStudyData()
 
     # Socket Stream Open
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
