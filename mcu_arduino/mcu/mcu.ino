@@ -107,6 +107,7 @@ void print_brightness() {
 }
 
 void loop() {
+  analogWrite(7, 0);
   if (irrecv.decode(&results)) {
     if (results.value == 0xFF629D) {
       sleep_flag = sleep_flag ? false : true;
@@ -271,7 +272,7 @@ void loop() {
         matrix.fillScreen(0);
       }
     }
-    else if (cmd == 111) {
+    else if (cmd == 17) {
       t = millis();
       mode = 5;
     }
@@ -319,16 +320,17 @@ void loop() {
     }
   }
   else if (mode == 5) {
+    analogWrite(7, 100);
     matrix.fillScreen(0);
     matrix.setCursor(1, 1);
     matrix.print("Alarm");
     matrix.setCursor(1, 9);
     matrix.print("!!!!!");
-    if (millis() - t > 15000) {
+    if (millis() - t > 5000) {
+      analogWrite(7, 0);
       mode = 1;
     }
   }
-
   matrix.swapBuffers(true);
 }
 

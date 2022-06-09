@@ -20,6 +20,7 @@ def alertAlarm():
         if alarm[1] == now and alarm[1] != latest_alarm:
             print("server>> alert Alarm!")
             latest_alarm = now
+            ard_ctl.sendRemoteCmd(15)
     threading.Timer(1, alertAlarm).start()
 
 
