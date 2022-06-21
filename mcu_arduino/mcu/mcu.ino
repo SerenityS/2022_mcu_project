@@ -23,6 +23,8 @@
 #define DHT11_PIN 12
 #define DHTTYPE DHT11
 DHT dht(DHT11_PIN, DHTTYPE);
+float temp;
+float hud;
 
 // Define IRremote
 int RECV_PIN = 22;
@@ -62,8 +64,8 @@ void setup() {
 
   // Initialize DHT11
   dht.begin();
-  dht.readHumidity();
-  dht.readTemperature();
+  hud = dht.readHumidity();
+  temp = dht.readTemperature();
 
   // Initialize IRremote
   irrecv.enableIRIn();
@@ -349,8 +351,6 @@ void loop() {
   // Temp/Hud Screen
   else if (screen == 3) {
     checkSleep();
-    float hud = dht.readHumidity();
-    float temp = dht.readTemperature();
     if (!isnan(hud) || !isnan(temp)) {
       matrix.fillScreen(0);
       matrix.setCursor(1, 1);
@@ -358,6 +358,8 @@ void loop() {
       matrix.setCursor(1, 9);
       matrix.print(hud);
     }
+    hud = dht.readHumidity();
+    temp = dht.readTemperature();
     delay(20);
   }
   // Brightness Screen
