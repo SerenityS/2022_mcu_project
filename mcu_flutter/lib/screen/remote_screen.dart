@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:mcu/util/socket_client.dart';
 
@@ -9,6 +11,8 @@ class RemoteScreen extends StatefulWidget {
 }
 
 class _RemoteScreenState extends State<RemoteScreen> {
+  double aspectRatio = 1.2;
+
   final elements = [
     const Icon(Icons.fast_rewind, color: Colors.white, size: 40),
     const Icon(Icons.fast_forward, color: Colors.white, size: 40),
@@ -34,6 +38,15 @@ class _RemoteScreenState extends State<RemoteScreen> {
     for (int i = 1; i < 9; i++) const Color.fromARGB(75, 0, 0, 0),
     Colors.red
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    if (Platform.isWindows) {
+      aspectRatio = 1.0;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Center(

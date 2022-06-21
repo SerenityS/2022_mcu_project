@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:desktop_window/desktop_window.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mcu/const/const.dart';
@@ -97,10 +100,19 @@ class _MainScreenState extends State<MainScreen> {
         });
   }
 
+  void _setWindowSize() async {
+    await DesktopWindow.setWindowSize(const Size(450, 1000));
+    await DesktopWindow.setMinWindowSize(const Size(450, 1000));
+    await DesktopWindow.setMaxWindowSize(const Size(450, 1000));
+  }
+
   @override
   void initState() {
     super.initState();
     _controller = PersistentTabController(initialIndex: 0);
+    if (Platform.isWindows) {
+      _setWindowSize();
+    }
   }
 
   @override
