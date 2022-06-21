@@ -116,7 +116,7 @@ void loop() {
   analogWrite(7, 0);
 
   // Change LED Color when study 10sec for test
-  if (Rtc.GetDateTime() - start >= 10 && !fever_flag && !sleep_flag && sleep_flag) {
+  if (Rtc.GetDateTime() - start >= 10 && !fever_flag && !sleep_flag) {
     fever_flag = true;
     for (int i = 0; i < 24; i++) {
       pixels.setPixelColor(i, 255, 0, 0);
