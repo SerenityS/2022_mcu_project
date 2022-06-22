@@ -53,8 +53,8 @@ RtcDS1302<ThreeWire> Rtc(myWire);
 
 Adafruit_NeoPixel pixels(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 
-int brightness = 51;
-int old_brightness = 51;
+int brightness = 125;
+int old_brightness = 125;
 
 int screen = 1;
 
