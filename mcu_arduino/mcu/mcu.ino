@@ -186,14 +186,14 @@ void loop() {
     // - Button
     else if (results.value == 0xFFE01F) {
       brightness -= 25;
-      if (brightness < 1) brightness = 1;
+      if (brightness < 25) brightness = 25;
       screen = 4;
       set_brightness();
     }
     // + Button
     else if (results.value == 0xFFA857) {
       brightness += 25;
-      if (brightness > 226) brightness = 226;
+      if (brightness > 255) brightness = 255;
       screen = 4;
       set_brightness();
     }
@@ -370,7 +370,7 @@ void loop() {
     matrix.print("Brigh");
     matrix.setCursor(1, 9);
     matrix.print("t: ");
-    matrix.print((brightness / 25) % 10 + 1);
+    matrix.print((brightness / 25) % 11);
     if (millis() - t > 5000) {
       screen = 1;
     }
