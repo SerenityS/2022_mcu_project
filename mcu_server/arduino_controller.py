@@ -32,11 +32,11 @@ class ArduinoController:
 
     def sendSerialCmd(self, index):
         cmd = f"{index + 2}"
-        self.ser.write(bytes(cmd, "utf-8"))
+        self.ser.write(bytes(cmd + "\n", "utf-8"))
         print(f"server>> Send Remote Command")
 
     def setDateTime(self):
         now = datetime.datetime.now()
         dt = f"1,{now.year},{now.month},{now.day},{now.hour},{now.minute},{now.second}"
-        self.ser.write(bytes(dt, "utf-8"))
+        self.ser.write(bytes(dt + "\n", "utf-8"))
         print(f"server>> Initialize RTC Time: {now}")
