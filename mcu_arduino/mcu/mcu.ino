@@ -275,14 +275,14 @@ void loop() {
     // - Button
     else if (cmd == 5) {
       brightness -= 25;
-      if (brightness < 1) brightness = 1;
+      if (brightness < 25) brightness = 25;
       screen = 4;
       set_brightness();
     }
     // + Button
     else if (cmd == 6) {
       brightness += 25;
-      if (brightness > 226) brightness = 226;
+      if (brightness > 255) brightness = 255;
       screen = 4;
       set_brightness();
     }
